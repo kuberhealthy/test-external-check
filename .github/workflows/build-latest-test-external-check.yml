@@ -1,0 +1,29 @@
+name: Build and Push Test-External-Check Latest
+on:
+  push:
+    branches:
+    - master
+env:
+  ORG_NAME: kuberhealthy
+  IMAGE_NAME: test-external-check
+  TAG: latest
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+    - name: dockerfile sweep for best practices
+      uses: burdzwastaken/hadolint-action@master
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        HADOLINT_ACTION_DOCKERFILE_FOLDER: cmd/test-external-check
+        HADOLINT_ACTION_COMMENT: false
+    - name: build container
+      run: docker build -f cmd/$IMAGE_NAME/Dockerfile -t $ORG_NAME/$IMAGE_NAME:$TAG .
+    - name: Log into docker hub
+      run: echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u integrii --password-stdin
+    - name: Push new latest image
+      run: |
+          docker push $ORG_NAME/$IMAGE_NAME:$TAG
+    - name: scan docker image for vulnerabilities
+      run: curl -s https://ci-tools.anchore.io/inline_scan-v0.6.0 | bash -s -- -p -r $ORG_NAME/$IMAGE_NAME:$TAG
