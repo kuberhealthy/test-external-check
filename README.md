@@ -1,5 +1,3 @@
-# THIS PROJECT IS CURRENTLY UNDER MIGRATION PLEASE VISIT [THE CURRENT SOURCE](https://github.com/kuberhealthy/kuberhealthy/tree/master/cmd/test-external-check)
-
 ### test-external-check
 
 This is a container used to test external checks in Kuberhealthy. This container simply runs, waits for a set interval of seconds and then either reports a success or failure depending on the `REPORT_FAILURE` environment variable set in the pod spec.
